@@ -20,7 +20,7 @@ import tradingview_ta
 class TestStrategy(Strategy):
     parameters = {
         "symbol": "SPY",
-        "quantity": 1,
+        "quantity": 20,
         "side": "buy"
     }
     
@@ -45,7 +45,7 @@ class TestStrategy(Strategy):
         if "BUY" or "STRONG_BUY" in rec5 and self.last_trade == "sell":
             order = self.create_order(symbol, quantity, side)
             self.last_trade = "buy"
-            self.parameters = "sell"
+            self.parameters["side"] = "sell"
             self.submit_order(order)
         elif "SELL" or "STRONG_SELL" in rec5 and self.last_trade == "buy":
             order = self.create_order(symbol, quantity, side)
