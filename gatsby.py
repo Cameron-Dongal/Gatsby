@@ -35,8 +35,8 @@ class TestStrategy(Strategy):
                     screener='america',
                     exchange='AMEX',
                     interval='5m')
-        
-        rec5 = output.get_analysis()["RECOMMENDATION"]
+     
+        rec5 = output.get_analysis().summary["RECOMMENDATION"]
 
         symbol = self.parameters["symbol"]
         quantity = self.parameters["quantity"]
