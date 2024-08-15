@@ -19,43 +19,58 @@ import tradingview_ta
 
 class TestStrategy(Strategy):
     parameters = {
-        "symbol": "SPY",
-        "quantity": 20,
+        "symbol": "BTC/USD",
+        "quantity": .1,
         "side": "buy"
     }
+
     
-    def initialize(self, symbol="SPY"):
-        self.sleeptime = "5M"
+    def initialize(self, symbol="BTC/USD"):#change to spy / btc/usd
+        self.sleeptime = "1M"
         self.last_trade = "sell"
         self.minutes_before_closing = 8
+        self.set_market('24/7') #delete when not using crypto to test afterhours, and replace btc symbols and exchange with spy and amex
 
     def on_trading_iteration(self):
+        
+        print("last trade: ", self.last_trade)
 
-        output = TA_Handler(symbol='SPY',
-                    screener='america',
-                    exchange='AMEX',
-                    interval='5m')
+        output = TA_Handler(symbol='BTCUSDC', #change to spy / btcusdc
+                    screener='crypto', #change to america / crytpo
+                    exchange='KRAKEN', #change to amex / kraken
+                    interval='1m')
      
         rec5 = output.get_analysis().summary["RECOMMENDATION"]
 
+        print(output.get_analysis().summary)
+        print(rec5)
+
         symbol = self.parameters["symbol"]
         quantity = self.parameters["quantity"]
-        side = self.parameters["side"]
 
-        if "BUY" or "STRONG_BUY" in rec5 and self.last_trade == "sell":
-            order = self.create_order(symbol, quantity, side)
-            self.last_trade = "buy"
-            self.parameters["side"] = "sell"
-            self.submit_order(order)
-        elif "SELL" or "STRONG_SELL" in rec5 and self.last_trade == "buy":
-            order = self.create_order(symbol, quantity, side)
-            self.parameters["side"]="buy"
-            self.last_trade="sell"
-            self.submit_order(order)   
+        if rec5 == "BUY" or rec5 == "STRONG_BUY":
+            if self.last_trade == "sell":
+                print("Currently buying")
+                order = self.create_order(symbol, quantity, "buy")
+                self.last_trade = "buy"
+                self.parameters["side"] = "sell"
+                self.submit_order(order)
+
+        elif rec5 == "SELL" or rec5 == "STRONG_SELL":
+            if self.last_trade == "buy":
+                print("Currently selling")
+                order = self.create_order(symbol, quantity, "sell")
+                self.parameters["side"] = "buy"
+                self.last_trade = "sell"
+                self.submit_order(order)
+        
+    def on_abrupt_closing(self):
+        self.log_message("Abrupt closing")
+        self.sell_all()
             
 trader = Trader()
 broker = Alpaca(ALPACA_CONFIG)
-strategy = TestStrategy(broker=broker, parameters={"symbol":"SPY"})
+strategy = TestStrategy(broker=broker, parameters={"symbol":"BTC/USD"}) #change to spy / btc/usd
 
 trader.add_strategy(strategy)
 trader.run_all()
