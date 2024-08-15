@@ -25,19 +25,19 @@ class TestStrategy(Strategy):
     }
 
     
-    def initialize(self, symbol="BTC/USD"):#change to spy / btc/usd
+    def initialize(self, symbol="SPY"):#change to spy / btc/usd
         self.sleeptime = "1M"
         self.last_trade = "sell"
         self.minutes_before_closing = 8
-        self.set_market('24/7') #delete when not using crypto to test afterhours, and replace btc symbols and exchange with spy and amex
+        #self.set_market('24/7') #delete when not using crypto to test afterhours, and replace btc symbols and exchange with spy and amex
 
     def on_trading_iteration(self):
         
         print("last trade: ", self.last_trade)
 
-        output = TA_Handler(symbol='BTCUSDC', #change to spy / btcusdc
-                    screener='crypto', #change to america / crytpo
-                    exchange='KRAKEN', #change to amex / kraken
+        output = TA_Handler(symbol='SPY', #change to spy / btcusdc
+                    screener='america', #change to america / crytpo
+                    exchange='amex', #change to amex / kraken
                     interval='1m')
      
         rec5 = output.get_analysis().summary["RECOMMENDATION"]
@@ -70,7 +70,7 @@ class TestStrategy(Strategy):
             
 trader = Trader()
 broker = Alpaca(ALPACA_CONFIG)
-strategy = TestStrategy(broker=broker, parameters={"symbol":"BTC/USD"}) #change to spy / btc/usd
+strategy = TestStrategy(broker=broker, parameters={"symbol":"SPY"}) #change to spy / btc/usd
 
 trader.add_strategy(strategy)
 trader.run_all()
