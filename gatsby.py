@@ -20,7 +20,7 @@ import tradingview_ta
 class TestStrategy(Strategy):
     parameters = {
         "symbol": "BTC/USD",#change to spy / btc/usd
-        "quantity": .1,
+        "quantity": 1,
         "side": "buy"
     }
 
@@ -54,6 +54,7 @@ class TestStrategy(Strategy):
         if self.last_trade == "sell":
             print("Position: None")
 
+
         if rec5 == "BUY" or rec5 == "STRONG_BUY":
             if self.last_trade == "sell":
                 print("Entering position...")
@@ -64,11 +65,10 @@ class TestStrategy(Strategy):
 
         elif rec5 == "SELL" or rec5 == "STRONG_SELL":
             if self.last_trade == "buy":
-                print("Exiting posiition")
-                order = self.create_order(symbol, quantity, "sell")
+                print("Exiting position")
                 self.parameters["side"] = "buy"
                 self.last_trade = "sell"
-                self.submit_order(order)
+                self.sell_all()#temp workaround incase buy gets filled at .9999 instead of 1 then tries to sell 1 and cant
         
 
 
