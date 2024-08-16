@@ -45,13 +45,14 @@ class TestStrategy(Strategy):
         symbol = self.parameters["symbol"]
         quantity = self.parameters["quantity"]
 
-        position = self.get_position(symbol)
 
         print(symbol, " : ", output.get_analysis().summary)
         print(rec5, " recommended, checking position...")
 
-
-        print("Position:", position)
+        if self.last_trade == "buy":
+            print("Position: ", quantity, " of ", symbol)
+        if self.last_trade == "sell":
+            print("Position: None")
 
         if rec5 == "BUY" or rec5 == "STRONG_BUY":
             if self.last_trade == "sell":
