@@ -65,7 +65,7 @@ class TestStrategy(Strategy):
         elif rec5 == "SELL" or rec5 == "STRONG_SELL":
             if self.last_trade == "buy":
                 print("Exiting posiition")
-                order = self.create_order(symbol, quantity, "buy")
+                order = self.create_order(symbol, quantity, "sell")
                 self.parameters["side"] = "buy"
                 self.last_trade = "sell"
                 self.submit_order(order)
