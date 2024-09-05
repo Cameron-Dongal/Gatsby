@@ -28,4 +28,4 @@ for a in symbols:
     print('Symbol: ',a[1])
     print(output.get_analysis().summary)
 
-    
+
