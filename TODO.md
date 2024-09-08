@@ -2,7 +2,7 @@ MOST IMPORTANT -> LEAST IMPORTANT
 
 format TODO better
 
-does not achieve alpha
+does not achieve alpha\n
   [ ] Use VIX to determine market chop or (up)trend; if in trend change indicators so I dont stop out early
     [ ]if VIX > 100 SMA
 
