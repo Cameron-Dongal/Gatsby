@@ -39,7 +39,7 @@ class TestStrategy(Strategy):
         self.current_position = None
         self.risk = risk
         #self.minutes_before_closing = 8
-        self.set_market('24/7') #delete when not using crypto to test afterhours, and replace btc symbols and exchange with spy and amex
+        #self.set_market('24/7') #delete when not using crypto to test afterhours, and replace btc symbols and exchange with spy and amex
 
     def technicals(self):
 #        output = TA_Handler(symbol='spy', #change to spy / btcusdc
@@ -87,64 +87,30 @@ class TestStrategy(Strategy):
         print(headlines)
         print(probability)
         print(sentiment)
-
         print(technicals)
         print(cash)
 
         print("\n", self.current_position)
 
-        if cash > last_price:
+        exit_today = False
 
-            if technicals == "HOLD_LONG":
-                if self.current_position == "short":
-                    print("Closing short position")
-                    self.current_position = None
-                    self.sell_all()
-                if sentiment == "positive" and probability > .8:
-                    order = self.create_order(
-                        symbol,
-                        quantity,
-                        "buy",
-                        type="bracket",
-                        take_profit_price = last_price*1.6,
-                        stop_loss_price = last_price*0.95
-                        )
-                    self.current_position = "long"
-                    self.submit_order(order)
-                    print("Long order submitted for ", quantity, " shares")
-                if sentiment == "neutral":#to account for long term upside bias of market
-                    order = self.create_order(
-                        symbol,
-                        quantity/2,
-                        "buy",
-                        type="bracket",
-                        take_profit_price = last_price*1.6,
-                        stop_loss_price = last_price*0.95
-                        )
-                    self.current_position = "long"
-                    self.submit_order(order)
-                    print("Long order submitted for ", quantity/2, " shares")
-            elif technicals == "HOLD_SHORT":
-                if self.current_position == "long":
-                    print("Closing long position")
-                    self.sell_all()
-                    self.current_position = None
-                if sentiment == "negative" and probability > .66:
-                    order = self.create_order(
-                        symbol,
-                        quantity,
-                        "sell",
-                        type="bracket",
-                        take_profit_price = last_price*.8,
-                        stop_loss_price = last_price *1.05
-                    )
-                    self.current_position = "short"
-                    self.submit_order(order)
-                    print("Short order submitted for ", quantity, " shares")
-            elif technicals == "BUY":
-                if self.current_position == "short":
-                    print("Closing short position")
-                    self.sell_all()
+        if technicals == "HOLD_LONG":
+
+            print("\nif technicals = HOLD LONG\n")
+
+            if self.current_position == "short":
+
+                print("\nClosing short position\n")
+
+                self.current_position = None
+                exit_today = True
+                self.sell_all()
+
+
+            if sentiment == "positive" and probability > .8 and exit_today == False and cash > last_price:
+
+                print("\nSentiment positive, probability > .8\n")
+                
                 order = self.create_order(
                     symbol,
                     quantity,
@@ -156,22 +122,99 @@ class TestStrategy(Strategy):
                 self.current_position = "long"
                 self.submit_order(order)
                 print("Long order submitted for ", quantity, " shares")
-            elif technicals == "SELL":
-                if self.current_position == "long":
-                    print("Closing long position")
-                    self.current_position = None
-                    self.sell_all()
+
+            elif sentiment == "neutral" and cash > last_price:#to account for long term upside bias of market
+
+                print("\nSentiment neutral\n")
+
+                order = self.create_order(
+                    symbol,
+                    quantity/2,
+                    "buy",
+                    type="bracket",
+                    take_profit_price = last_price*1.6,
+                    stop_loss_price = last_price*0.95
+                    )
+                self.current_position = "long"
+                self.submit_order(order)
+                print("Long order submitted for ", quantity/2, " shares")
+
+
+        elif technicals == "HOLD_SHORT":
+
+            print("\ntechnicals = HOLD SHORT\n")
+
+            if self.current_position == "long":
+                print("Closing long position")
+                self.sell_all()
+                self.current_position = None
+
+            if sentiment == "negative" and probability > .66:
+
+                print("\nsentiment negative with probability >.66\n")
+
                 order = self.create_order(
                     symbol,
                     quantity,
                     "sell",
                     type="bracket",
-                    take_profit_price = last_price*.9,
-                    stop_loss_price = last_price *1.03
+                    take_profit_price = last_price*.8,
+                    stop_loss_price = last_price *1.05
                 )
                 self.current_position = "short"
                 self.submit_order(order)
-                print("Short order submitted for ", quantity/2, " shares")
+                print("Short order submitted for ", quantity, " shares")
+
+        elif technicals == "BUY":
+
+            print("\ntechnicals = buy\n")
+
+            if self.current_position == "short":
+
+                print("\nClosing short position\n")
+                self.current_position = None
+                self.sell_all()
+                print("\ncash after closing short position: ", cash)
+                exit_today = True
+
+
+            if cash > last_price and exit_today == False:
+                order = self.create_order(
+                    symbol,
+                    quantity,
+                    "buy",
+                    type="bracket",
+                    take_profit_price = last_price*1.6,
+                    stop_loss_price = last_price*0.95
+                    )
+                self.current_position = "long"
+                self.submit_order(order)
+                print("Long order submitted for ", quantity, " shares")
+
+
+        elif technicals == "SELL":
+
+            print("\ntechnicals = SELL\n")
+
+            if self.current_position == "long":
+
+                print("\nClosing long position\n")
+                self.current_position = None
+                self.sell_all()
+
+
+            order = self.create_order(
+                symbol,
+                quantity,
+                "sell",
+                type="bracket",
+                take_profit_price = last_price*.9,
+                stop_loss_price = last_price *1.03
+            )
+            self.current_position = "short"
+            self.submit_order(order)
+            print("Short order submitted for ", quantity/2, " shares")
+
 
          
     def on_abrupt_closing(self):
@@ -179,8 +222,8 @@ class TestStrategy(Strategy):
         self.sell_all()
         self.current_position = None
             
-start_date = datetime(2022,1,1)
-end_date = datetime(2022,9,15)
+start_date = datetime(2021,1,1)
+end_date = datetime(2024,8,15)
 
 
 
