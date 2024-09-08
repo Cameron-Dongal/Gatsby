@@ -5,7 +5,7 @@ import pandas_ta as ta
 
 today = '2024-09-05'
 
-def macd(today):
+def macd(today, ticker):
 
     today = pd.to_datetime(today).tz_localize('UTC').tz_convert('America/New_York').normalize()
 
@@ -18,7 +18,7 @@ def macd(today):
     print("\nTodays Date: ",today)
 
 
-    df = yf.Ticker('SPY').history(period='5y', interval='1d')[['Close', 'Open', 'High', 'Volume', 'Low']]
+    df = yf.Ticker(ticker).history(period='5y', interval='1d')[['Close', 'Open', 'High', 'Volume', 'Low']]
     df.ta.macd(close='close',fast=12,slow=26,signal=9,append=True)
     df.index = df.index.normalize()
 

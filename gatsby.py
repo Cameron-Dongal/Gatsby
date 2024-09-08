@@ -49,7 +49,7 @@ class TestStrategy(Strategy):
 #     
 #        recommendation = output.get_analysis().summary["RECOMMENDATION"]
         today, seven_days_ago = self.news_start_date()
-        recommendation = macd(today)
+        recommendation = macd(today, self.symbol)
         return recommendation
 
     def sizing(self):
