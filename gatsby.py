@@ -94,9 +94,11 @@ class TestStrategy(Strategy):
         if volatility ==True:
             tp = 1.6
             sl = .95
+            print("The past week has been relatively volatile\n")
         else:
             tp = 2.0
             sl = .83
+            print("The past wweek has been relatively unvolatile\n")
 
         print(headlines)
         print(probability)
@@ -153,7 +155,7 @@ class TestStrategy(Strategy):
                 print("Long order submitted for ", quantity/2, " shares")
 
 
-        elif technicals == "HOLD_SHORT" and volatility == True:
+        elif technicals == "HOLD_SHORT" and volatility != False:
 
             print("\ntechnicals = HOLD SHORT\n")
 
@@ -205,7 +207,7 @@ class TestStrategy(Strategy):
                 print("Long order submitted for ", quantity, " shares")
 
 
-        elif technicals == "SELL" and volatility == True:
+        elif technicals == "SELL" and volatility != False:
 
             print("\ntechnicals = SELL\n")
 
