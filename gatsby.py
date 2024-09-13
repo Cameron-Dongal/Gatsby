@@ -94,7 +94,7 @@ class TestStrategy(Strategy):
         if volatility ==True:
             tp = 1.6
             sl = .95
-        elif volatility == False:
+        else:
             tp = 2.0
             sl = .83
 
@@ -108,7 +108,7 @@ class TestStrategy(Strategy):
 
         exit_today = False
 
-        if technicals == "HOLD_LONG" and volatility == False:
+        if technicals == "HOLD_LONG":
 
             print("\nif technicals = HOLD LONG\n")
 
@@ -178,7 +178,7 @@ class TestStrategy(Strategy):
                 self.submit_order(order)
                 print("Short order submitted for ", quantity, " shares")
 
-        elif technicals == "BUY" and volatility == False:
+        elif technicals == "BUY":
 
             print("\ntechnicals = buy\n")
 
