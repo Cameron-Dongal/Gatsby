@@ -30,6 +30,7 @@ from tradingview_ta import TA_Handler, Interval, Exchange
 import tradingview_ta
 
 from macd import macd
+from vix_100_sma import vix_sma
 
 class TestStrategy(Strategy):
 
@@ -51,6 +52,11 @@ class TestStrategy(Strategy):
         today, seven_days_ago = self.news_start_date()
         recommendation = macd(today, self.symbol)
         return recommendation
+    
+    def volatility(self):
+        today = self.get_datetime()
+        volatility = vix_sma(today)
+        return volatility
 
     def sizing(self):
         cash = self.get_cash()
@@ -84,6 +90,14 @@ class TestStrategy(Strategy):
         cash, last_price, quantity = self.sizing()
         symbol = self.symbol
 
+        volatility = self.volatility()
+        if volatility ==True:
+            tp = 1.6
+            sl = .95
+        elif volatility == False:
+            tp = 2.0
+            sl = .83
+
         print(headlines)
         print(probability)
         print(sentiment)
@@ -94,7 +108,7 @@ class TestStrategy(Strategy):
 
         exit_today = False
 
-        if technicals == "HOLD_LONG":
+        if technicals == "HOLD_LONG" and volatility == False:
 
             print("\nif technicals = HOLD LONG\n")
 
@@ -106,7 +120,6 @@ class TestStrategy(Strategy):
                 exit_today = True
                 self.sell_all()
 
-
             if sentiment == "positive" and probability > .8 and exit_today == False and cash > last_price:
 
                 print("\nSentiment positive, probability > .8\n")
@@ -116,8 +129,8 @@ class TestStrategy(Strategy):
                     quantity,
                     "buy",
                     type="bracket",
-                    take_profit_price = last_price*1.6,
-                    stop_loss_price = last_price*0.95
+                    take_profit_price = last_price*tp,
+                    stop_loss_price = last_price*sl
                     )
                 self.current_position = "long"
                 self.submit_order(order)
@@ -132,15 +145,15 @@ class TestStrategy(Strategy):
                     quantity/2,
                     "buy",
                     type="bracket",
-                    take_profit_price = last_price*1.6,
-                    stop_loss_price = last_price*0.95
+                    take_profit_price = last_price*tp,
+                    stop_loss_price = last_price*sl
                     )
                 self.current_position = "long"
                 self.submit_order(order)
                 print("Long order submitted for ", quantity/2, " shares")
 
 
-        elif technicals == "HOLD_SHORT":
+        elif technicals == "HOLD_SHORT" and volatility == True:
 
             print("\ntechnicals = HOLD SHORT\n")
 
@@ -165,7 +178,7 @@ class TestStrategy(Strategy):
                 self.submit_order(order)
                 print("Short order submitted for ", quantity, " shares")
 
-        elif technicals == "BUY":
+        elif technicals == "BUY" and volatility == False:
 
             print("\ntechnicals = buy\n")
 
@@ -184,15 +197,15 @@ class TestStrategy(Strategy):
                     quantity,
                     "buy",
                     type="bracket",
-                    take_profit_price = last_price*1.6,
-                    stop_loss_price = last_price*0.95
+                    take_profit_price = last_price*tp,
+                    stop_loss_price = last_price*sl
                     )
                 self.current_position = "long"
                 self.submit_order(order)
                 print("Long order submitted for ", quantity, " shares")
 
 
-        elif technicals == "SELL":
+        elif technicals == "SELL" and volatility == True:
 
             print("\ntechnicals = SELL\n")
 
@@ -223,7 +236,7 @@ class TestStrategy(Strategy):
         self.current_position = None
             
 start_date = datetime(2021,1,1)
-end_date = datetime(2024,8,15)
+end_date = datetime(2024,9,11)
 
 
 

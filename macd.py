@@ -3,8 +3,6 @@ import pandas as pd
 import pandas_ta as ta
 
 
-today = '2024-09-05'
-
 def macd(today, ticker):
 
     today = pd.to_datetime(today).tz_localize('UTC').tz_convert('America/New_York').normalize()
@@ -46,5 +44,3 @@ def macd(today, ticker):
 
         return "NO_DATA"
 
-
-macd(today)
