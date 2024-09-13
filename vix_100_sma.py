@@ -2,29 +2,29 @@ import yfinance as yf
 import pandas as pd
 import pandas_ta as ta
 
-today = '2024-09-05'
 
-ticker = '^VIX'
 
-def vix_sma(today, ticker):
 
-    today = pd.to_datetime(today).tz_localize('UTC').tz_convert('America/New_York').normalize()
 
-    day = today.weekday()
-    if day == 0:
-        yesterday = today - pd.DateOffset(3)
-    else:
-        yesterday = today - pd.DateOffset(1)
+def vix_sma(today):
 
+    ticker = '^VIX'
 
 
     df = yf.Ticker(ticker).history(period='5y', interval='1d')[['Close', 'Open', 'High', 'Volume', 'Low']]
-    sma100 = df.ta.sma(close = 'close',length=100)
+    df.ta.sma(close = 'close',length=100,append=True)
     df.index = df.index.normalize()
 
+    sma100 = df.loc[df.index == today,'SMA_100']
+    vix = df.loc[df.index == today,'Close']
 
+    sma100 = sma100.iloc[0]
+    vix = vix.iloc[0]
 
-    print(sma100)
-    return(sma100)
+    if sma100 <= vix:
+        print("VIX is above the SMA")
+        return True
+    if vix < sma100:
+        print("VIX is below the SMA")
+        return False
 
-vix_sma(today, ticker)
